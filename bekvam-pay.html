@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>bekväm — pagamento</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&family=Montserrat:wght@300;400;500&family=Titillium+Web:wght@600&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --linen:  #E6E2DB;
+      --cafe:   #2A2421;
+      --ouro:   #8a6010;
+      --cafe10: rgba(42,36,33,0.10);
+      --cafe25: rgba(42,36,33,0.25);
+    }
+
+    html, body {
+      background: var(--linen);
+      color: var(--cafe);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 64px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .wordmark {
+      font-family: 'Titillium Web', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      text-transform: lowercase;
+      color: var(--cafe);
+    }
+
+    .submark {
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ouro);
+      margin-top: 4px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid var(--cafe);
+    }
+
+    .card-section {
+      padding: 24px 24px 20px;
+      border-bottom: 1px solid var(--cafe10);
+    }
+
+    .card-section:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-size: 9px;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--ouro);
+      margin-bottom: 5px;
+    }
+
+    .projeto-nome {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: 20px;
+      line-height: 1.25;
+      color: var(--cafe);
+    }
+
+    .valor {
+      font-size: 36px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+      color: var(--cafe);
+      line-height: 1;
+    }
+
+    .valor-sub {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--cafe);
+      opacity: 0.45;
+      margin-top: 5px;
+    }
+
+    /* ── BANCO ROWS ── */
+    .banco-row {
+      display: flex;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--cafe10);
+      gap: 10px;
+    }
+
+    .banco-label {
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--cafe);
+      opacity: 0.45;
+      width: 110px;
+      flex-shrink: 0;
+    }
+
+    .banco-value {
+      font-size: 12.5px;
+      font-weight: 400;
+      color: var(--cafe);
+      flex: 1;
+    }
+
+    .btn-copy-inline {
+      flex-shrink: 0;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--cafe);
+      opacity: 0.35;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      transition: opacity 0.15s;
+    }
+
+    .btn-copy-inline:hover { opacity: 1; }
+    .btn-copy-inline.ok    { opacity: 1; color: #3a5a3a; }
+
+    /* ── BANCO COLLAPSE ── */
+    .banco-collapse-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: none;
+    }
+
+    .banco-collapse-header:hover { background: rgba(42,36,33,0.03); }
+
+    .chevron {
+      color: var(--cafe);
+      opacity: 0.4;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .chevron.open { transform: rotate(180deg); }
+
+    .banco-body {
+      padding: 0 24px 20px;
+      border-top: 1px solid var(--cafe10);
+    }
+
+    .banco-aviso {
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      color: var(--cafe);
+      opacity: 0.40;
+      text-align: center;
+    }
+
+    .banco-aviso-top {
+      padding: 14px 0 12px;
+      border-bottom: 1px solid var(--cafe10);
+      margin-bottom: 2px;
+      opacity: 0;
+      animation: fadeInAviso 0.4s ease forwards;
+    }
+
+    @keyframes fadeInAviso {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 0.55; transform: translateY(0); }
+    }
+
+    .banco-anim {
+      opacity: 0;
+      transform: translateX(-18px);
+    }
+
+    .banco-anim.visible {
+      animation: slideInRow 0.32s ease forwards;
+      animation-delay: calc(0.18s + var(--i) * 0.08s);
+    }
+
+    @keyframes slideInRow {
+      from { opacity: 0; transform: translateX(-18px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── PIX SECTION ── */
+    .pix-wrap {
+      padding: 28px 24px 24px;
+    }
+
+    .qr-outer {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .qr-frame {
+      border: 1px solid var(--cafe);
+      padding: 14px;
+      display: inline-block;
+      background: var(--linen);
+    }
+
+    #qrcode canvas, #qrcode img {
+      display: block;
+    }
+
+    .chave-row {
+      display: flex;
+      border: 1px solid var(--cafe);
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .chave-text {
+      flex: 1;
+      padding: 11px 14px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      color: var(--cafe);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      background: var(--linen);
+    }
+
+    .btn-copiar {
+      flex-shrink: 0;
+      background: var(--cafe);
+      color: var(--linen);
+      border: none;
+      padding: 0 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-copiar:hover { background: var(--ouro); }
+    .btn-copiar.ok    { background: #3a5a3a; }
+
+    .instrucao {
+      font-size: 10.5px;
+      font-weight: 300;
+      line-height: 1.75;
+      color: var(--cafe);
+      opacity: 0.55;
+      text-align: center;
+    }
+
+    /* ── OUTROS MÉTODOS ── */
+    .outros-wrap {
+      padding: 20px 24px 24px;
+      border-top: 1px solid var(--cafe10);
+    }
+
+    .metodo-link {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      border: 1px solid var(--cafe25);
+      background: transparent;
+      padding: 13px 16px;
+      margin-bottom: 9px;
+      cursor: pointer;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--cafe);
+      text-decoration: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+
+    .metodo-link:last-child { margin-bottom: 0; }
+
+    .metodo-link:hover {
+      border-color: var(--cafe);
+      background: rgba(42,36,33,0.04);
+    }
+
+    .metodo-icon {
+      width: 28px;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      margin-top: 44px;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cafe);
+      opacity: 0.30;
+      text-align: center;
+    }
+
+    /* ── ESTADO ERRO ── */
+    .erro {
+      text-align: center;
+      padding: 32px 24px;
+    }
+
+    .erro p {
+      font-size: 13px;
+      opacity: 0.6;
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="wordmark">bekväm</div>
+  </header>
+
+  <div class="card" id="card">
+    <!-- populated by JS -->
+  </div>
+
+  <footer class="footer">bekväm smart solutions &nbsp;·&nbsp; ribeirão preto, sp</footer>
+
+  <script>
+  // ─────────────────────────────────────────────────────────
+  //  PIX PAYLOAD GENERATOR  (EMV / BCB padrão BACEN)
+  // ─────────────────────────────────────────────────────────
+  function crc16(str) {
+    let crc = 0xFFFF;
+    for (let i = 0; i < str.length; i++) {
+      crc ^= str.charCodeAt(i) << 8;
+      for (let j = 0; j < 8; j++) {
+        crc = (crc & 0x8000) ? (crc << 1) ^ 0x1021 : crc << 1;
+      }
+    }
+    return (crc & 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+  }
+
+  function tlv(id, value) {
+    return id + String(value.length).padStart(2, '0') + value;
+  }
+
+  function gerarPixPayload({ chave, nome, cidade, valor, txid }) {
+    nome   = (nome   || 'Bekvam').substring(0, 25).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    cidade = (cidade || 'Ribeirao Preto').substring(0, 15).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    txid   = (txid   || '***').substring(0, 25);
+
+    const mercAcc =
+      tlv('00', 'BR.GOV.BCB.PIX') +
+      tlv('01', chave);
+
+    const addData = tlv('62', tlv('05', txid));
+
+    let body =
+      tlv('00', '01') +
+      tlv('01', '12') +
+      tlv('26', mercAcc) +
+      tlv('52', '0000') +
+      tlv('53', '986') +
+      (valor ? tlv('54', valor) : '') +
+      tlv('58', 'BR') +
+      tlv('59', nome) +
+      tlv('60', cidade) +
+      addData +
+      '6304';
+
+    return body + crc16(body);
+  }
+
+  // ─────────────────────────────────────────────────────────
+  //  PARSE URL PARAMS
+  //  p     = projeto (nome do projeto)
+  //  v     = valor em reais  ex: 86838.00  ou  86838
+  //  pix   = chave PIX (email, CPF, CNPJ, telefone, aleatória)
+  //  nome  = nome do recebedor para o payload (sem acento, até 25 chars)
+  //  cidade= cidade do recebedor (sem acento, até 15 chars)
+  //  id    = txid / identificador (ex: 3100)
+  //  cartao= URL para link de cartão (ex: link Mercado Pago)
+  //  boleto= URL para link de boleto
+  // ─────────────────────────────────────────────────────────
+  const p      = new URLSearchParams(window.location.search);
+  const projeto = p.get('p')      || 'Bekväm Smart Solutions';
+  const valor   = p.get('v')      || '';       // reais, ponto decimal
+  const chave   = p.get('pix')    || 'a0562d17-31b8-4ab8-bb1d-54d4436996ff';
+  const nome    = p.get('nome')   || 'Bekvam Smart Solutions';
+  const cidade  = p.get('cidade') || 'Ribeirao Preto';
+  const txid    = p.get('id')     || ('BKV' + Date.now().toString().slice(-8));
+  const cartao  = p.get('cartao') || '';
+  const boleto  = p.get('boleto') || '';
+
+  // ─────────────────────────────────────────────────────────
+  //  FORMAT DISPLAY VALUE
+  // ─────────────────────────────────────────────────────────
+  let valorDisplay  = 'A combinar';
+  let valorPayload  = '';
+
+  if (valor) {
+    const num = parseFloat(valor.replace(',', '.'));
+    if (!isNaN(num)) {
+      valorDisplay = 'R$ ' + num.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      valorPayload = num.toFixed(2);
+    }
+  }
+
+  const iconCopy = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+  const iconCheck = `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+  // ─────────────────────────────────────────────────────────
+  //  BUILD CARD HTML
+  // ─────────────────────────────────────────────────────────
+  const card = document.getElementById('card');
+
+  card.innerHTML = `
+    <div class="card-section">
+      <div class="label">Projeto</div>
+      <div class="projeto-nome">${escHtml(projeto)}</div>
+    </div>
+
+    <div class="card-section">
+      <div class="label">Valor</div>
+      <div class="valor">${escHtml(valorDisplay)}</div>
+      ${valorDisplay !== 'A combinar' ? '<div class="valor-sub">Pagamento único</div>' : ''}
+    </div>
+
+    <div class="pix-wrap">
+      <div class="label" style="margin-bottom:16px">PIX</div>
+
+      <div class="chave-row">
+        <span class="chave-text" id="chave-display">${escHtml(chave)}</span>
+        <button class="btn-copiar" id="btn-copiar" onclick="copiar()">Copiar código</button>
+      </div>
+
+      <div class="qr-outer" style="margin-top:20px">
+        <div class="qr-frame">
+          <div id="qrcode"></div>
+        </div>
+      </div>
+
+      <p class="instrucao" style="margin-top:16px">
+        No app do banco → PIX → Pagar → Copia e Cola<br>
+        ou aponte a câmera para o QR Code
+      </p>
+    </div>
+
+    <div class="card-section banco-collapse-header" onclick="toggleBanco(this)">
+      <div class="label">Transferência bancária</div>
+      <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+
+    <div class="banco-body" style="display:none">
+      <p class="banco-aviso banco-aviso-top">Transferências bancárias podem levar até 1 dia útil para confirmação.</p>
+      <div class="banco-row banco-anim" style="--i:0">
+        <span class="banco-label">Titular</span>
+        <span class="banco-value">RR Automação Residencial Ltda</span>
+        <button class="btn-copy-inline" onclick="copiarTexto('RR Automação Residencial Ltda', event)" title="Copiar">${iconCopy}</button>
+      </div>
+      <div class="banco-row banco-anim" style="--i:1">
+        <span class="banco-label">Banco</span>
+        <span class="banco-value">Inter &nbsp;·&nbsp; 077</span>
+        <button class="btn-copy-inline" onclick="copiarTexto('077', event)" title="Copiar">${iconCopy}</button>
+      </div>
+      <div class="banco-row banco-anim" style="--i:2">
+        <span class="banco-label">Agência</span>
+        <span class="banco-value">0001</span>
+        <button class="btn-copy-inline" onclick="copiarTexto('0001', event)" title="Copiar">${iconCopy}</button>
+      </div>
+      <div class="banco-row banco-anim" style="--i:3">
+        <span class="banco-label">Conta corrente</span>
+        <span class="banco-value">5635789-3</span>
+        <button class="btn-copy-inline" onclick="copiarTexto('56357893', event)" title="Copiar">${iconCopy}</button>
+      </div>
+      <div class="banco-row banco-anim" style="--i:4;border-bottom:none">
+        <span class="banco-label">CNPJ</span>
+        <span class="banco-value">35.834.595/0001-65</span>
+        <button class="btn-copy-inline" onclick="copiarTexto('35834595000165', event)" title="Copiar">${iconCopy}</button>
+      </div>
+    </div>
+
+    ${(cartao || boleto) ? `
+    <div class="outros-wrap">
+      <div class="label" style="margin-bottom:14px">Outras formas</div>
+      ${cartao ? `<a href="${escHtml(cartao)}" class="metodo-link" target="_blank" rel="noopener">
+        <span class="metodo-icon">💳</span> Cartão de crédito / débito
+      </a>` : ''}
+      ${boleto ? `<a href="${escHtml(boleto)}" class="metodo-link" target="_blank" rel="noopener">
+        <span class="metodo-icon">📄</span> Boleto bancário
+      </a>` : ''}
+    </div>` : ''}
+  `;
+
+  // ─────────────────────────────────────────────────────────
+  //  GENERATE QR CODE
+  // ─────────────────────────────────────────────────────────
+  const pixPayload = gerarPixPayload({
+    chave:  chave,
+    nome:   nome,
+    cidade: cidade,
+    valor:  valorPayload,
+    txid:   txid
+  });
+
+  window._pixPayload = pixPayload;
+
+  new QRCode(document.getElementById('qrcode'), {
+    text:        pixPayload,
+    width:       200,
+    height:      200,
+    colorDark:   '#2A2421',
+    colorLight:  '#E6E2DB',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+
+  // ─────────────────────────────────────────────────────────
+  //  COPY HANDLER
+  // ─────────────────────────────────────────────────────────
+  function toggleBanco(header) {
+    const body = header.nextElementSibling;
+    const chevron = header.querySelector('.chevron');
+    const open = body.style.display === 'none';
+    if (open) {
+      body.style.display = 'block';
+      chevron.classList.add('open');
+      // reset then re-trigger animations
+      body.querySelectorAll('.banco-anim').forEach(el => {
+        el.classList.remove('visible');
+        void el.offsetWidth; // reflow
+        el.classList.add('visible');
+      });
+      const aviso = body.querySelector('.banco-aviso-top');
+      if (aviso) {
+        aviso.style.animation = 'none';
+        void aviso.offsetWidth;
+        aviso.style.animation = '';
+      }
+    } else {
+      body.style.display = 'none';
+      chevron.classList.remove('open');
+      body.querySelectorAll('.banco-anim').forEach(el => el.classList.remove('visible'));
+    }
+  }
+
+  function copiarTexto(texto, btnOrEvent) {
+    const btn = btnOrEvent instanceof Event ? btnOrEvent.currentTarget : btnOrEvent;
+    if (btnOrEvent instanceof Event) btnOrEvent.stopPropagation();
+    const original = btn.innerHTML;
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      ta.style.position = 'fixed';
+      ta.style.opacity  = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    };
+    const feedback = () => {
+      btn.innerHTML = iconCheck;
+      btn.classList.add('ok');
+      setTimeout(() => { btn.innerHTML = original; btn.classList.remove('ok'); }, 2500);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(texto).catch(fallback).finally(feedback);
+    } else { fallback(); feedback(); }
+  }
+
+  function copiar() {
+    const btn = document.getElementById('btn-copiar');
+
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = window._pixPayload;
+      ta.style.position = 'fixed';
+      ta.style.opacity  = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(window._pixPayload)
+        .catch(fallback)
+        .finally(feedback);
+    } else {
+      fallback();
+      feedback();
+    }
+
+    function feedback() {
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('ok');
+      setTimeout(() => {
+        btn.textContent = 'Copiar código';
+        btn.classList.remove('ok');
+      }, 2500);
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────
+  //  UTILS
+  // ─────────────────────────────────────────────────────────
+  function escHtml(str) {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+  </script>
+</body>
+</html>
