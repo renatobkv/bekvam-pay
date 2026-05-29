@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>bekväm — gerar cobrança</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&family=Montserrat:wght@300;400;500&family=Titillium+Web:wght@600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --linen:  #E6E2DB;
+      --cafe:   #2A2421;
+      --ouro:   #8a6010;
+      --cafe10: rgba(42,36,33,0.10);
+    }
+
+    html, body {
+      background: var(--linen);
+      color: var(--cafe);
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 48px 20px 64px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 44px;
+    }
+
+    .wordmark {
+      font-family: 'Titillium Web', sans-serif;
+      font-weight: 600;
+      font-size: 20px;
+      text-transform: lowercase;
+      color: var(--cafe);
+    }
+
+    .card {
+      width: 100%;
+      max-width: 380px;
+      border: 1px solid var(--cafe);
+    }
+
+    .card-section {
+      padding: 24px 24px 20px;
+      border-bottom: 1px solid var(--cafe10);
+    }
+
+    .card-section:last-child { border-bottom: none; }
+
+    .label {
+      font-size: 9px;
+      letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--ouro);
+      margin-bottom: 8px;
+    }
+
+    .field {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--cafe10);
+      padding: 6px 0;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 300;
+      font-size: 15px;
+      color: var(--cafe);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .field::placeholder { opacity: 0.30; }
+    .field:focus { border-bottom-color: var(--cafe); }
+
+    .field-valor {
+      font-size: 28px;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+    }
+
+    .prefix {
+      font-size: 13px;
+      opacity: 0.45;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    .valor-wrap {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .valor-wrap .field { flex: 1; }
+
+    .btn-gerar {
+      width: 100%;
+      background: var(--cafe);
+      color: var(--linen);
+      border: none;
+      padding: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-gerar:hover { background: var(--ouro); }
+
+    .resultado {
+      display: none;
+      margin-top: 20px;
+      width: 100%;
+      max-width: 380px;
+    }
+
+    .link-box {
+      border: 1px solid var(--cafe);
+      display: flex;
+      overflow: hidden;
+    }
+
+    .link-text {
+      flex: 1;
+      padding: 12px 14px;
+      font-size: 11px;
+      color: var(--cafe);
+      opacity: 0.65;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-family: 'Montserrat', sans-serif;
+      background: var(--linen);
+    }
+
+    .btn-copiar-link {
+      flex-shrink: 0;
+      background: var(--cafe);
+      color: var(--linen);
+      border: none;
+      padding: 0 18px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-copiar-link:hover { background: var(--ouro); }
+    .btn-copiar-link.ok    { background: #3a5a3a; }
+
+    .abrir-link {
+      display: block;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cafe);
+      opacity: 0.40;
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .abrir-link:hover { opacity: 0.8; }
+
+    .footer {
+      margin-top: 44px;
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--cafe);
+      opacity: 0.30;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="wordmark">bekväm</div>
+  </header>
+
+  <div class="card">
+    <div class="card-section">
+      <div class="label">Projeto</div>
+      <input class="field" id="inp-projeto" type="text" placeholder="Nome do projeto ou cliente" autocomplete="off">
+    </div>
+
+    <div class="card-section">
+      <div class="label">Valor</div>
+      <div class="valor-wrap">
+        <span class="prefix">R$</span>
+        <input class="field field-valor" id="inp-valor" type="text" placeholder="0,00" autocomplete="off" inputmode="decimal">
+      </div>
+    </div>
+
+    <div class="card-section">
+      <div class="label">Referência <span style="opacity:.4;font-size:8px;letter-spacing:.1em">opcional</span></div>
+      <input class="field" id="inp-id" type="text" placeholder="Ex: 3207" autocomplete="off">
+    </div>
+
+    <button class="btn-gerar" onclick="gerar()">Gerar link de pagamento</button>
+  </div>
+
+  <div class="resultado" id="resultado">
+    <div class="link-box">
+      <span class="link-text" id="link-text"></span>
+      <button class="btn-copiar-link" id="btn-copiar-link" onclick="copiarLink()">Copiar link</button>
+    </div>
+    <a class="abrir-link" id="abrir-link" href="#" target="_blank" rel="noopener">Abrir página de pagamento →</a>
+  </div>
+
+  <footer class="footer">bekväm smart solutions &nbsp;·&nbsp; ribeirão preto, sp</footer>
+
+  <script>
+  const BASE = 'https://bekvam-pay.vercel.app/';
+
+  function gerar() {
+    const projeto = document.getElementById('inp-projeto').value.trim();
+    const valor   = document.getElementById('inp-valor').value.trim().replace(',', '.');
+    const id      = document.getElementById('inp-id').value.trim();
+
+    if (!projeto) {
+      document.getElementById('inp-projeto').focus();
+      return;
+    }
+
+    const params = new URLSearchParams();
+    params.set('p', projeto);
+    if (valor && !isNaN(parseFloat(valor))) params.set('v', parseFloat(valor).toFixed(2));
+    if (id) params.set('id', id);
+
+    const url = BASE + '?' + params.toString();
+
+    document.getElementById('link-text').textContent = url;
+    document.getElementById('abrir-link').href = url;
+
+    const res = document.getElementById('resultado');
+    res.style.display = 'block';
+
+    copiarLink();
+  }
+
+  function copiarLink() {
+    const url = document.getElementById('link-text').textContent;
+    const btn = document.getElementById('btn-copiar-link');
+
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    };
+
+    const feedback = () => {
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('ok');
+      setTimeout(() => { btn.textContent = 'Copiar link'; btn.classList.remove('ok'); }, 2500);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(url).catch(fallback).finally(feedback);
+    } else { fallback(); feedback(); }
+  }
+
+  document.getElementById('inp-valor').addEventListener('keydown', e => {
+    if (e.key === 'Enter') gerar();
+  });
+  </script>
+</body>
+</html>
