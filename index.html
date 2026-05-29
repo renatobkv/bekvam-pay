@@ -103,6 +103,14 @@
       margin-top: 5px;
     }
 
+    .valor-obs {
+      font-size: 11px;
+      color: var(--cafe);
+      opacity: 0.55;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
     /* ── BANCO ROWS ── */
     .banco-row {
       display: flex;
@@ -416,6 +424,7 @@
   const txid    = p.get('id')     || ('BKV' + Date.now().toString().slice(-8));
   const cartao  = p.get('cartao') || '';
   const boleto  = p.get('boleto') || '';
+  const obs     = p.get('obs')    || '';
 
   // ─────────────────────────────────────────────────────────
   //  FORMAT DISPLAY VALUE
@@ -449,6 +458,7 @@
       <div class="label">Valor</div>
       <div class="valor">${escHtml(valorDisplay)}</div>
       ${valorDisplay !== 'A combinar' ? '<div class="valor-sub">Pagamento único</div>' : ''}
+      ${obs ? `<div class="valor-obs">${escHtml(obs)}</div>` : ''}
     </div>
 
     <div class="pix-wrap">

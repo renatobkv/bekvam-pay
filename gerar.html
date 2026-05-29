@@ -45,23 +45,23 @@
 
     .card {
       width: 100%;
-      max-width: 380px;
+      max-width: 760px;
       border: 1px solid var(--cafe);
     }
 
     .card-section {
-      padding: 24px 24px 20px;
+      padding: 36px 40px 32px;
       border-bottom: 1px solid var(--cafe10);
     }
 
     .card-section:last-child { border-bottom: none; }
 
     .label {
-      font-size: 9px;
+      font-size: 10px;
       letter-spacing: 0.20em;
       text-transform: uppercase;
       color: var(--ouro);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
     .field {
@@ -69,10 +69,10 @@
       background: transparent;
       border: none;
       border-bottom: 1px solid var(--cafe10);
-      padding: 6px 0;
+      padding: 10px 0;
       font-family: 'Montserrat', sans-serif;
       font-weight: 300;
-      font-size: 15px;
+      font-size: 20px;
       color: var(--cafe);
       outline: none;
       transition: border-color 0.15s;
@@ -82,15 +82,15 @@
     .field:focus { border-bottom-color: var(--cafe); }
 
     .field-valor {
-      font-size: 28px;
+      font-size: 42px;
       font-weight: 300;
       letter-spacing: -0.01em;
     }
 
     .prefix {
-      font-size: 13px;
+      font-size: 18px;
       opacity: 0.45;
-      margin-right: 4px;
+      margin-right: 6px;
       vertical-align: middle;
     }
 
@@ -123,7 +123,7 @@
       display: none;
       margin-top: 20px;
       width: 100%;
-      max-width: 380px;
+      max-width: 760px;
     }
 
     .link-box {
@@ -215,6 +215,11 @@
       <input class="field" id="inp-id" type="text" placeholder="Ex: 3207" autocomplete="off">
     </div>
 
+    <div class="card-section">
+      <div class="label">Observação <span style="opacity:.4;font-size:8px;letter-spacing:.1em">opcional</span></div>
+      <input class="field" id="inp-obs" type="text" placeholder="Ex: Referente à Fase 1 — Marco 2" autocomplete="off">
+    </div>
+
     <button class="btn-gerar" onclick="gerar()">Gerar link de pagamento</button>
   </div>
 
@@ -245,6 +250,8 @@
     params.set('p', projeto);
     if (valor && !isNaN(parseFloat(valor))) params.set('v', parseFloat(valor).toFixed(2));
     if (id) params.set('id', id);
+    const obs = document.getElementById('inp-obs').value.trim();
+    if (obs) params.set('obs', obs);
 
     const url = BASE + '?' + params.toString();
 
