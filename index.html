@@ -13,8 +13,9 @@
       --linen:  #E6E2DB;
       --cafe:   #2A2421;
       --ouro:   #8a6010;
-      --cafe10: rgba(42,36,33,0.10);
-      --cafe25: rgba(42,36,33,0.25);
+      --cafe10:     rgba(42,36,33,0.10);
+      --cafe25:     rgba(42,36,33,0.25);
+      --terracota:  #B85C38;
     }
 
     html, body {
@@ -322,6 +323,31 @@
       flex-shrink: 0;
     }
 
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      background: var(--terracota);
+      color: var(--linen);
+      padding: 16px 28px;
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 100;
+      box-shadow: 0 8px 32px rgba(184,92,56,0.30);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
     /* ── FOOTER ── */
     .footer {
       margin-top: 44px;
@@ -355,6 +381,8 @@
   <div class="card" id="card">
     <!-- populated by JS -->
   </div>
+
+  <div class="toast" id="toast">Cole no seu banco — PIX Copia e Cola</div>
 
   <footer class="footer">bekväm smart solutions &nbsp;·&nbsp; ribeirão preto, sp</footer>
 
@@ -632,6 +660,9 @@
         btn.textContent = 'Copiar código';
         btn.classList.remove('ok');
       }, 2500);
+      const toast = document.getElementById('toast');
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3500);
     }
   }
 
