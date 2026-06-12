@@ -16,6 +16,8 @@
       --cafe10:     rgba(42,36,33,0.10);
       --cafe25:     rgba(42,36,33,0.25);
       --terracota:  #B85C38;
+      --sage:       #627459;
+      --dusk:       #565E85;
     }
 
     html, body {
@@ -189,17 +191,88 @@
       text-align: center;
     }
 
-    .banco-aviso-top {
-      padding: 14px 0 12px;
+    .banco-alerta {
+      border-left: 3px solid var(--terracota);
+      background: rgba(184,92,56,0.07);
+      padding: 14px 16px;
+      margin-bottom: 4px;
       border-bottom: 1px solid var(--cafe10);
-      margin-bottom: 2px;
       opacity: 0;
       animation: fadeInAviso 0.4s ease forwards;
     }
 
+    .banco-alerta-titulo {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--terracota);
+      margin-bottom: 8px;
+    }
+
+    .banco-alerta p {
+      font-size: 11px;
+      line-height: 1.65;
+      color: var(--cafe);
+      opacity: 0.75;
+    }
+
+    .banco-alerta strong {
+      font-weight: 500;
+      color: var(--cafe);
+      opacity: 1;
+    }
+
+    .ted-instrucao {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--cafe);
+      opacity: 0.65;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+
+    .ted-email {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--cafe);
+      text-decoration: none;
+      border-bottom: 1px solid var(--cafe25);
+      padding-bottom: 1px;
+      transition: border-color 0.15s;
+    }
+
+    .ted-email:hover { border-color: var(--cafe); }
+
+    .ted-contatos {
+      display: flex;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .ted-btn {
+      flex: 1;
+      text-align: center;
+      padding: 11px 0;
+      border: none;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--linen);
+      text-decoration: none;
+      transition: opacity 0.15s;
+    }
+
+    .ted-btn:hover { opacity: 0.85; }
+
+    #ted-mailto    { background: var(--dusk); }
+    #ted-whatsapp  { background: var(--sage); }
+
     @keyframes fadeInAviso {
       from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 0.55; transform: translateY(0); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     .banco-anim {
@@ -509,37 +582,12 @@
       </p>
     </div>
 
-    <div class="card-section banco-collapse-header" onclick="toggleBanco(this)">
+    <div class="card-section">
       <div class="label">Transferência bancária</div>
-      <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-
-    <div class="banco-body" style="display:none">
-      <p class="banco-aviso banco-aviso-top">Transferências bancárias podem levar até 1 dia útil para confirmação.</p>
-      <div class="banco-row banco-anim" style="--i:0">
-        <span class="banco-label">Titular</span>
-        <span class="banco-value">RR Automação Residencial Ltda</span>
-        <button class="btn-copy-inline" onclick="copiarTexto('RR Automação Residencial Ltda', event)" title="Copiar">${iconCopy}</button>
-      </div>
-      <div class="banco-row banco-anim" style="--i:1">
-        <span class="banco-label">Banco</span>
-        <span class="banco-value">Inter &nbsp;·&nbsp; 077</span>
-        <button class="btn-copy-inline" onclick="copiarTexto('077', event)" title="Copiar">${iconCopy}</button>
-      </div>
-      <div class="banco-row banco-anim" style="--i:2">
-        <span class="banco-label">Agência</span>
-        <span class="banco-value">0001</span>
-        <button class="btn-copy-inline" onclick="copiarTexto('0001', event)" title="Copiar">${iconCopy}</button>
-      </div>
-      <div class="banco-row banco-anim" style="--i:3">
-        <span class="banco-label">Conta corrente</span>
-        <span class="banco-value">5635789-3</span>
-        <button class="btn-copy-inline" onclick="copiarTexto('56357893', event)" title="Copiar">${iconCopy}</button>
-      </div>
-      <div class="banco-row banco-anim" style="--i:4;border-bottom:none">
-        <span class="banco-label">CNPJ</span>
-        <span class="banco-value">35.834.595/0001-65</span>
-        <button class="btn-copy-inline" onclick="copiarTexto('35834595000165', event)" title="Copiar">${iconCopy}</button>
+      <p class="ted-instrucao">Para pagamento via TED, solicite<br>ao nosso departamento financeiro.</p>
+      <div class="ted-contatos">
+        <a class="ted-btn" id="ted-mailto" href="#">Enviar e-mail</a>
+        <a class="ted-btn" id="ted-whatsapp" href="#" target="_blank" rel="noopener">Enviar WhatsApp</a>
       </div>
     </div>
 
@@ -567,6 +615,17 @@
   });
 
   window._pixPayload = pixPayload;
+
+  const mailAssunto = encodeURIComponent('Pagamento via TED — ' + projeto);
+  const mailCorpo  = encodeURIComponent(
+    'Olá,\n\nPreciso alinhar um pagamento por transferência (TED) e gostaria de saber os dados bancários.\n\nMeu banco de envio será: \n\nAguardo retorno.\n\nAtenciosamente,\n\nREF: ' + projeto
+  );
+  const tedLink = document.getElementById('ted-mailto');
+  if (tedLink) tedLink.href = 'mailto:financeiro@bekvam.com.br?subject=' + mailAssunto + '&body=' + mailCorpo;
+
+  const waMsg = encodeURIComponent('Olá, preciso alinhar um pagamento via TED referente ao projeto ' + projeto + '.');
+  const waLink = document.getElementById('ted-whatsapp');
+  if (waLink) waLink.href = 'https://wa.me/551634421917?text=' + waMsg;
 
   new QRCode(document.getElementById('qrcode'), {
     text:        pixPayload,
